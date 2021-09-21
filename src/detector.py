@@ -6,10 +6,9 @@ import pandas as pd
 
 
 class Detector:
-    def __init__(self, directory, language="english"):
+    def __init__(self, handler_list, language="english"):
         self.language = language
-        self.catalog = Catalog(directory)
-        self.handler_list = [PDFHandler(filepath) for filepath in self.catalog]
+        self.handler_list = handler_list
         self.analyzer_list = self.setup_pairs()
 
     def setup_pairs(self):
