@@ -1,6 +1,6 @@
-from catalog import Catalog
-from pdfhandler import PDFHandler
-from analyzer import Analyzer
+from src.catalog import Catalog
+from src.pdfhandler import PDFHandler
+from src.analyzer import Analyzer
 from itertools import combinations
 import pandas as pd
 
@@ -23,9 +23,3 @@ class Detector:
         for analyzer in self.analyzer_list:
             df_metrics = df_metrics.append(analyzer.extract_metrics())
         return df_metrics
-
-
-d = Detector("../resources", language="portuguese")
-d.setup_pairs()
-results = d.process()
-print(results)
