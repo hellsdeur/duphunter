@@ -8,9 +8,9 @@ from src.pdfhandler import PDFHandler
 from src.detector import Detector
 
 import dash
-from dash import html
-from dash import dcc
-from dash import dash_table
+import dash_html_components as html
+import dash_core_components as dcc
+import dash_table
 from dash.dependencies import Input, Output, State
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -75,6 +75,7 @@ def parse_contents(list_of_contents, list_of_filename):
             )
         ])
     ])
+
 
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
