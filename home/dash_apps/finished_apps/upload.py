@@ -37,6 +37,7 @@ app.layout = html.Div([
     html.Div(id='output-data-upload'),
 ])
 
+
 def parse_contents(list_of_contents, list_of_filename):
     handler_list = []
 
@@ -62,16 +63,33 @@ def parse_contents(list_of_contents, list_of_filename):
     )
     d.setup_pairs()
     results = d.process()
-    print(results)
+    metrics = results[0]
+    excerpts = results[1]
 
-    return html.Div([
-        html.Div([
-            dash_table.DataTable(
-                data=results.to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in results.columns]
-            )
-        ])
+    metrics_table = html.Div([
+        dash_table.DataTable(
+            style_data={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+            },
+            data=metrics.to_dict('records'),
+            columns=[{'name': i, 'id': i} for i in metrics.columns]
+        )
     ])
+
+    excerpts_table = html.Div([
+        dash_table.DataTable(
+            style_data={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+            },
+            data=excerpts.to_dict('records'),
+            columns=[{'name': i, 'id': i} for i in excerpts.columns]
+        )
+    ])
+
+    return html.Div([metrics_table, excerpts_table])
+
 
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
