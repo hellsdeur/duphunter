@@ -29,4 +29,14 @@ class Detector:
         for differ in self.differs_list:
             df_excerpts = df_excerpts.append(differ.extract_excerpts())
 
-        return df_metrics, df_excerpts
+        return self.normalize(df_metrics), df_excerpts
+
+    @staticmethod
+    def normalize(df):
+        df_norm = pd.DataFrame()
+        df_norm["PAIR_OF_FILES"] = df["PAIR_OF_FILES"]
+        minmax = {col: {"min": min(df[col]), "max": max(df[col])} for col in df.columns if col != "PAIR_OF_FILES"}
+        for col in df.columns:
+            if col != "PAIR_OF_FILES":
+                df_norm[col + " (%)"] = (df[col] - minmax[col]["min"]) / (minmax[col]["max"] - minmax[col]["min"]) * 100
+        return df_norm.round(3)

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DupHunter - Plagiarism Analysis Report</title>
+</head>
+<body>
+    <h1>Plagiarism Analysis Report</h1>
+    This document is an auto-generated report which aims to describe
+    the traces of plagiarism that
+    <a href="https://duphunter.herokuapp.com/">DupHunter</a>
+    detected across the PDF files that you submitted.
+
+    <h2>List of processed files</h2>
+    The following table lists your submitted PDF files, along with general information.<br>
+    {{ file_table }}
+
+    <h2>Similarity Analysis</h2>
+
+    The following graphs shows the proportion of similarity accordingly to three metrics collected
+    for each pair of files. Visit our <a href="https://github.com/hellsdeur/duphunter/wiki">wiki</a> to find more
+    information about the metrics.<br>
+    {{ metrics_graphs }}<br><br>
+
+    The following table summarizes the similarity metrics collected for each pair of files.<br>
+    {{ metrics_table }}
+
+    <h2>Excerpts under Suspicion</h2>
+    The following table lists the excerpts for each pair of files under plagiarism suspicion.<br>
+    {{ excerpts_table }}
+
+</body>
+</html>

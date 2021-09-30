@@ -3,6 +3,7 @@ import io
 
 from home.src.pdfhandler import PDFHandler
 from home.src.detector import Detector
+from home.src.report import Report
 
 from django_plotly_dash import DjangoDash
 import dash_html_components as html
@@ -29,7 +30,6 @@ app.layout = html.Div([
             'borderStyle': 'dashed',
             'borderRadius': '5px',
             'textAlign': 'center',
-            'margin': '10px'
         },
         multiple=True
     ),

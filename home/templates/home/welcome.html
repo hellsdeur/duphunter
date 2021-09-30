@@ -4,7 +4,7 @@
 {% block content %}
     {% load plotly_dash %}
 
-    <div class="{% plotly_class name='upload' %} card" style="height:100%; width: 100%">
+    <div class="{% plotly_class name='upload' %} file-upload card" style="{% static '\css\templatemo-lava.css' %}">
         {% plotly_app name='upload' ratio=0.65 %}
     </div>
 

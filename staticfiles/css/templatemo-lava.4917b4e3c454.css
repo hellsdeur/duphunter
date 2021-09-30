@@ -32,7 +32,7 @@ font & reset css
 reset
 --------------------------------------------- 
 */
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, div,
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, div
 pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, ins, kbd, q,
 s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li,
 figure, header, nav, section, article, aside, footer, figcaption {
@@ -118,12 +118,12 @@ body {
 }
 
 ::selection {
-  background: #0CCA98;
+  background: 0CCA98;
   color: #fff;
 }
 
 ::-moz-selection {
-  background: #0CCA98;
+  background: 0CCA98;
   color: #fff;
 }
 
@@ -139,7 +139,7 @@ body {
     margin-bottom: 30px;
   }
   .mobile-bottom-fix-big {
-    margin-bottom: 60px;
+    margin-bottom: 60px;6
   }
 }
 
@@ -178,7 +178,7 @@ a.main-button {
 }
 
 a.main-button:hover {
-  background-color: #0CCA98;
+  background-color: 0CCA98;
 }
 
 button.main-button {
@@ -200,7 +200,7 @@ button.main-button {
 }
 
 button.main-button:hover {
-  background-color: #0CCA98;
+  background-color: 0CCA98;
 }
 
 
@@ -801,7 +801,7 @@ hunt
 */
 
 .left-image-decor {
-  background-image: url(../images/left-bg-decor.png);
+  background-image: url("../images/left-bg-decor.54828d62977f.png");
   background-repeat: no-repeat;
   position: absolute;
   width: 100%;
@@ -852,7 +852,7 @@ testimonials
 --------------------------------------------
 */
 .right-image-decor {
-  background-image: url(../images/right-bg-decor.png);
+  background-image: url("../images/right-bg-decor.54afbeec2961.png");
   background-repeat: no-repeat;
   background-position: right center;
   position: absolute;
@@ -979,7 +979,7 @@ footer
 
 footer {
   margin-top: 100px;
-  background-image: url(../images/footer-bg.png);
+  background-image: url("../images/footer-bg.3edcb0c6a563.png");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -1157,7 +1157,7 @@ preloader
 */
 #preloader {
   overflow: hidden;
-  background-image: linear-gradient(145deg, #f4813f 0%, #0CCA98 100%);
+  background-image: linear-gradient(145deg, #f4813f 0%, 0CCA98 100%);
   left: 0;
   right: 0;
   top: 0;
