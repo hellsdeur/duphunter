@@ -1,5 +1,8 @@
 import base64
 import io
+from datetime import datetime
+
+import pandas as pd
 
 from home.src.pdfhandler import PDFHandler
 from home.src.detector import Detector
@@ -10,8 +13,11 @@ import dash_html_components as html
 import dash_core_components as dcc
 import dash_table
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
+import plotly.express as px
+import dash_bootstrap_components as dbc
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = [dbc.themes.LUMEN]
 
 app = DjangoDash('upload', external_stylesheets=external_stylesheets)
 
@@ -33,15 +39,33 @@ app.layout = html.Div([
         },
         multiple=True
     ),
-    print("Waiting for input"),
-    html.Div(id='output-data-upload'),
+    html.Div([
+        html.Div(id="output-filenames"),
+        dbc.Button("Submit", id='submit-val', color="primary", block=True, n_clicks=0),
+        dbc.Spinner(
+            children=[html.Div(id='output-data-upload')],
+            size="lg",
+            color="primary",
+            type="border",
+            fullscreen=True,
+        )
+    ]),
 ])
 
 
-def parse_contents(list_of_contents, list_of_filename):
+def extract_filenames(list_of_filenames):
+    df = pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]})
+
+    return html.Div([
+        html.Center(html.P("The following files are up to process. Please, click the Submit button to start hunting.")),
+        dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True),
+    ])
+
+
+def parse_contents(list_of_contents, list_of_filenames):
     handler_list = []
 
-    for contents, filename in zip(list_of_contents, list_of_filename):
+    for contents, filename in zip(list_of_contents, list_of_filenames):
         content_type, content_string = contents.split(',')
 
         decoded = base64.b64decode(content_string)
@@ -53,9 +77,10 @@ def parse_contents(list_of_contents, list_of_filename):
         except Exception as e:
             print(e)
             return html.Div([
-                'There was an error processing this file.'
+                "There was an error processing a file. DupHunter only supports PDF files."
             ])
 
+    # detector produces the raw results
     d = Detector(
         handler_list,
         # language=mode([handler.language for handler in handler_list])
@@ -66,35 +91,63 @@ def parse_contents(list_of_contents, list_of_filename):
     metrics = results[0]
     excerpts = results[1]
 
+    # report produces the raw pdf file
+    # r = Report(
+    #     "templates",
+    #     pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]}).to_html(),
+    #     None,
+    #     metrics.to_html,
+    #     excerpts.to_html,
+    # )
+
+    # create divs to return
     metrics_table = html.Div([
-        dash_table.DataTable(
-            style_data={
-                'whiteSpace': 'normal',
-                'height': 'auto',
-            },
-            data=metrics.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in metrics.columns]
-        )
+        dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
     ])
 
     excerpts_table = html.Div([
-        dash_table.DataTable(
-            style_data={
-                'whiteSpace': 'normal',
-                'height': 'auto',
-            },
-            data=excerpts.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in excerpts.columns]
-        )
+        dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
     ])
 
-    return html.Div([metrics_table, excerpts_table])
+    # dateformat = "%Y%m%d_%H%M%S"
+    # download_button = html.Div([
+    #     dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
+    #      dcc.Download(id="download-report",
+    #          #dcc.send_bytes(r.pdf, filename=f"duphunter_{datetime.now().strftime(dateformat)}", type='pdf')
+    #     )
+    # ])
+
+    return html.Div([
+        html.Br(),
+        html.Center(html.H1("Similarity Analysis")),
+        metrics_table,
+        html.Br(),
+        html.Center(html.H1("Excerpts under Suspicion")),
+        excerpts_table,
+        html.Br(),
+        # html.Center(html.H1("Download full report")),
+        # download_button,
+    ])
 
 
 @app.callback(Output('output-data-upload', 'children'),
+              Input('submit-val', 'n_clicks'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'),
+              prevent_initial_call=True)
+def update_output(n_clicks, list_of_contents, list_of_names):
+    if n_clicks:
+        if list_of_contents is not None:
+            children = [parse_contents(list_of_contents, list_of_names)]
+            return children
+    return html.Div()
+
+
+@app.callback(Output('output-filenames', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'))
 def update_output(list_of_contents, list_of_names):
     if list_of_contents is not None:
-        children = [parse_contents(list_of_contents, list_of_names)]
+        children = extract_filenames(list_of_names)
         return children
+    return html.Div()

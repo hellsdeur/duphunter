@@ -7,7 +7,7 @@ import pandas as pd
 class Detector:
     def __init__(self, handler_list, language="english"):
         self.language = language
-        self.handler_list = handler_list
+        self.handler_list = sorted(handler_list, key=lambda x: x.filename)
         setup = self.setup_pairs()
         self.analyzer_list = setup[0]
         self.differs_list = setup[1]
