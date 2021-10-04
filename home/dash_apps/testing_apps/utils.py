@@ -1,11 +1,12 @@
 import base64
 import io
+from datetime import datetime
 import pandas as pd
 
 import dash_html_components as html
 import dash_core_components as dcc
 from plotly.subplots import make_subplots
-import plotly.express as px
+import plotly.io as pio
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 
@@ -55,21 +56,10 @@ class Utils:
         metrics = results[0]
         excerpts = results[1]
 
-        # report produces the raw pdf file
-        # r = Report(
-        #     "templates",
-        #     pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]}).to_html(),
-        #     None,
-        #     metrics.to_html,
-        #     excerpts.to_html,
-        # )
-
         # create divs to return
         metrics_table = html.Div([
             dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
         ])
-
-        print(list(metrics["PAIR_OF_FILES"]))
 
         fig = make_subplots(
             rows=len(metrics.index)//2, cols=2,
@@ -105,13 +95,28 @@ class Utils:
             dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
         ])
 
-        # dateformat = "%Y%m%d_%H%M%S"
-        # download_button = html.Div([
-        #     dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
-        #      dcc.Download(id="download-report",
-        #          #dcc.send_bytes(r.pdf, filename=f"duphunter_{datetime.now().strftime(dateformat)}", type='pdf')
-        #     )
-        # ])
+        # report produces the raw pdf file
+        r = Report(
+            "templates",
+            pd.DataFrame({"FILENAMES": [filename for filename in list_of_filenames if "pdf" in filename]}).to_html(),
+            # pio.to_html(fig=fig),
+            fig,
+            metrics.to_html(),
+            excerpts.to_html(),
+        )
+
+        # r.save_pdf()
+
+        dateformat = "%Y%m%d_%H%M%S"
+        download_button = html.Div([
+            dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
+            dcc.Download(id="download-report",
+                         data=dcc.send_bytes(
+                             src=r.pdf,
+                             filename=f"duphunter_{datetime.now().strftime(dateformat)}",
+                             type='pdf')
+                         )
+        ])
 
         return html.Div([
             html.Br(),
@@ -122,6 +127,6 @@ class Utils:
             html.Center(html.H1("Excerpts under Suspicion")),
             excerpts_table,
             html.Br(),
-            # html.Center(html.H1("Download full report")),
-            # download_button,
+            html.Center(html.H1("Download full report")),
+            download_button,
         ])

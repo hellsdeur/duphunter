@@ -25,9 +25,12 @@ class Report:
 
     def generate_pdf(self):
         b = io.BytesIO()
-        HTML(string=self.html).write_pdf(b)
+        HTML(string=self.html).write_pdf(b, stylesheets=["templates/style.css"])
         return b.getvalue()
 
     def save_pdf(self):
         dateformat = "%Y%m%d_%H%M%S"
-        HTML(string=self.html).write_pdf(f"duphunter_{datetime.now().strftime(dateformat)}.pdf")
+        HTML(string=self.html).write_pdf(
+            target=f"duphunter_{datetime.now().strftime(dateformat)}.pdf",
+            stylesheets=["templates/style.css"]
+        )

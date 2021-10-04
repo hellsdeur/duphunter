@@ -1,4 +1,5 @@
 from utils import Utils
+from datetime import datetime
 
 import dash
 import dash_html_components as html
@@ -66,6 +67,18 @@ def update_output(list_of_contents, list_of_names):
             children = Utils.extract_filenames(list_of_names)
             return children
     return html.Div()
+
+# @app.callbackcallback(Output('download-report', 'children'),
+#                       Input('submit-val', 'n_clicks'))
+# def download(n_clicks):
+#     dateformat = "%Y%m%d_%H%M%S"
+#     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+#     if 'submit-val' in changed_id:
+#         return dcc.send_bytes(
+#             src=pdf_file,
+#             filename=f"duphunter_{datetime.now().strftime(dateformat)}",
+#             type='pdf')
+#         )
 
 
 if __name__ == '__main__':
