@@ -38,10 +38,10 @@ app.layout = html.Div([
         dbc.Spinner(
             children=[
                 html.Div([
-                    html.Div(id='output-processing'),
-                    html.Br(),
                     dbc.Button("Download Full Report", id='button_down', color="primary", block=True, n_clicks=0),
                     dcc.Download(id="download-report")],
+                    html.Br(),
+                    html.Div(id='output-processing'),
                 )],
             size="lg",
             color="primary",
