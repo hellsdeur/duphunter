@@ -801,7 +801,7 @@ hunt
 */
 
 .left-image-decor {
-  background-image: url(../images/left-bg-decor.png);
+  background-image: url("../images/left-bg-decor.54828d62977f.png");
   background-repeat: no-repeat;
   position: absolute;
   width: 100%;
@@ -852,7 +852,7 @@ testimonials
 --------------------------------------------
 */
 .right-image-decor {
-  background-image: url(../images/right-bg-decor.png);
+  background-image: url("../images/right-bg-decor.54afbeec2961.png");
   background-repeat: no-repeat;
   background-position: right center;
   position: absolute;
@@ -979,7 +979,7 @@ footer
 
 footer {
   margin-top: 100px;
-  background-image: url(../images/footer-bg.png);
+  background-image: url("../images/footer-bg.3edcb0c6a563.png");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;

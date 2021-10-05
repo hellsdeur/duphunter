@@ -1243,8 +1243,8 @@ PDF File
 .file-upload {
   background-color: #ffffff;
   width: 1000px;
-  margin: 0 auto;
-  padding: 200px;
+  margin: 0 auto 100px auto;
+  padding: 20px;
 }
 
 .file-upload-btn {
