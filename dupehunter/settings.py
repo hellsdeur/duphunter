@@ -158,13 +158,18 @@ STATICFILES_FINDERS = [
 ]
 
 PLOTLY_COMPONENTS = [
+    # Common components
     'dash_core_components',
     'dash_html_components',
-    'dash_bootstrap_components',
     'dash_renderer',
+
+    # django-plotly-dash components
     'dpd_components',
+    # static support if serving local assets
     'dpd_static_support',
-    'dpd_components',
+
+    # Other components, as needed
+    'dash_bootstrap_components',
 ]
 
 # Static files (CSS, JavaScript, Images)

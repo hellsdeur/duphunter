@@ -11,9 +11,10 @@ from dash.exceptions import PreventUpdate
 
 external_stylesheets = [dbc.themes.LUMEN]
 
-app = DjangoDash('upload', external_stylesheets=external_stylesheets)
+app = DjangoDash('upload', add_bootstrap_links=True, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
+    dcc.Store(id="memory-output"),
     dcc.Upload(
         id='upload-data',
         children=html.Div([
@@ -31,14 +32,15 @@ app.layout = html.Div([
         },
         multiple=True
     ),
-    dcc.Store(id="memory-output"),
     html.Div([
         html.Div(id="output-filenames"),
         dbc.Button("Submit", id='submit-val', color="primary", block=True, n_clicks=0),
         dbc.Spinner(
             children=[
-                html.Div(id='output-processing'),
-                html.Br(),
+                html.Div([
+                    html.Div(id='output-processing'),
+                    html.Br(),
+                ])
             ],
             size="lg",
             color="primary",
@@ -46,7 +48,7 @@ app.layout = html.Div([
             fullscreen=True,
         ),
         dbc.Button("Download Full Report", id='button_down', color="primary", block=True, n_clicks=0),
-        dcc.Download(id="download-report")
+        dcc.Download(id="download-report"),
     ]),
 ])
 
@@ -55,12 +57,14 @@ app.layout = html.Div([
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'))
 def update_filenames(list_of_contents, list_of_names, **kwargs):
-    changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
-    print(changed_id)
-    if "upload-data" in changed_id:
-        if list_of_contents is not None:
-            return Utils.extract_filenames(list_of_names)
-    return None
+    # changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
+    # print(changed_id)
+    # if "upload-data" in changed_id:
+    #     if list_of_contents is not None:
+    #         return Utils.extract_filenames(list_of_names)
+    if list_of_contents is not None:
+        return Utils.extract_filenames(list_of_names)
+    return html.Div()
 
 
 @app.callback(Output('memory-output', 'data'),
@@ -81,9 +85,8 @@ def update_output(n_clicks, list_of_contents, list_of_names, **kwargs):
 @app.callback(Output('output-processing', 'children'),
               Input('memory-output', 'data'),
               Input('submit-val', 'n_clicks'),
-              Input('button_down', 'n_clicks'),
-              State('upload-data', 'filename'))
-def process(data, sub_clicks, dow_clicks, list_of_filenames):
+              Input('button_down', 'n_clicks'))
+def process(data, sub_clicks, dow_clicks):
     if sub_clicks is None:
         raise PreventUpdate
     if dow_clicks is None:
@@ -116,13 +119,16 @@ def download_report(n_clicks, data, list_of_filenames, **kwargs):
         raise PreventUpdate
     if data is None:
         raise PreventUpdate
-    dateformat = "%Y%m%d_%H%M%S"
+
     metrics = pd.read_json(data["METRICS"], orient='split')
     excerpts = pd.read_json(data["EXCERPTS"], orient='split')
     fig = Utils.plot(metrics)
+
     report = Utils.report('home/dash_apps/finished_apps/templates', list_of_filenames, fig, metrics, excerpts)
+
     changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
     if 'button_down' in changed_id:
+        dateformat = "%Y%m%d_%H%M%S"
         return dcc.send_bytes(
             src=report.pdf,
             filename=f"hunt_{datetime.now().strftime(dateformat)}",
