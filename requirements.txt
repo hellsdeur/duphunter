@@ -4,6 +4,7 @@ async-timeout==3.0.1
 attrs==21.2.0
 autobahn==21.3.1
 Automat==20.2.0
+bootstrap4==0.1.0
 Brotli==1.0.9
 certifi==2021.5.30
 cffi==1.14.6
