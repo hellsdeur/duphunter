@@ -56,11 +56,52 @@ class Utils:
         metrics = results[0]
         excerpts = results[1]
 
-        # create divs to return
-        metrics_table = html.Div([
-            dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
-        ])
+        # # create divs to return
+        # metrics_table = html.Div([
+        #     dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
+        # ])
+        #
 
+        #
+        # excerpts_table = html.Div([
+        #     dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
+        # ])
+        #
+        # # report produces the raw pdf file
+        #
+        #
+        # # r.save_pdf()
+        #
+        # dateformat = "%Y%m%d_%H%M%S"
+        # download_button = html.Div([
+        #     dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
+        #     dcc.Download(id="download-report",
+        #                  data=dcc.send_bytes(
+        #                      src=r.pdf,
+        #                      filename=f"duphunter_{datetime.now().strftime(dateformat)}",
+        #                      type='pdf')
+        #                  )
+        # ])
+        #
+        # return html.Div([
+        #     html.Br(),
+        #     html.Center(html.H1("Similarity Analysis")),
+        #     plot_figs,
+        #     metrics_table,
+        #     html.Br(),
+        #     html.Center(html.H1("Excerpts under Suspicion")),
+        #     excerpts_table,
+        #     html.Br(),
+        #     html.Center(html.H1("Download full report")),
+        #     download_button,
+        # ])
+        data = {"METRICS": metrics.to_json(orient='split'),
+                "EXCERPTS": excerpts.to_json(orient='split')}
+
+        return data
+
+    @staticmethod
+    def plot(metrics):
         fig = make_subplots(
             rows=len(metrics.index)//2, cols=2,
             subplot_titles=["and".join(pair.split('-'))
@@ -88,15 +129,11 @@ class Utils:
                 i += 1
 
         fig.update_yaxes(range=[0, 100])
+        return fig
 
-        plot_figs = html.Div([dcc.Graph(figure=fig)])
-
-        excerpts_table = html.Div([
-            dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
-        ])
-
-        # report produces the raw pdf file
-        r = Report(
+    @staticmethod
+    def report(list_of_filenames, fig, metrics, excerpts):
+        return Report(
             "templates",
             pd.DataFrame({"FILENAMES": [filename for filename in list_of_filenames if "pdf" in filename]}).to_html(),
             # pio.to_html(fig=fig),
@@ -104,29 +141,3 @@ class Utils:
             metrics.to_html(),
             excerpts.to_html(),
         )
-
-        # r.save_pdf()
-
-        dateformat = "%Y%m%d_%H%M%S"
-        download_button = html.Div([
-            dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
-            dcc.Download(id="download-report",
-                         data=dcc.send_bytes(
-                             src=r.pdf,
-                             filename=f"duphunter_{datetime.now().strftime(dateformat)}",
-                             type='pdf')
-                         )
-        ])
-
-        return html.Div([
-            html.Br(),
-            html.Center(html.H1("Similarity Analysis")),
-            plot_figs,
-            metrics_table,
-            html.Br(),
-            html.Center(html.H1("Excerpts under Suspicion")),
-            excerpts_table,
-            html.Br(),
-            html.Center(html.H1("Download full report")),
-            download_button,
-        ])
