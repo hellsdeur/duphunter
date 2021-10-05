@@ -55,6 +55,7 @@ app.layout = html.Div([
               State('upload-data', 'filename'))
 def update_filenames(list_of_contents, list_of_names):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    print(changed_id)
     if "upload-data" in changed_id:
         if list_of_contents is not None:
             return Utils.extract_filenames(list_of_names)

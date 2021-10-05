@@ -1,27 +1,20 @@
-import base64
-import io
+from .utils import Utils
 from datetime import datetime
-
 import pandas as pd
-
-from home.src.pdfhandler import PDFHandler
-from home.src.detector import Detector
-from home.src.report import Report
 
 from django_plotly_dash import DjangoDash
 import dash_html_components as html
 import dash_core_components as dcc
-import dash_table
 from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
-import plotly.express as px
 import dash_bootstrap_components as dbc
+from dash.exceptions import PreventUpdate
 
 external_stylesheets = [dbc.themes.LUMEN]
 
-app = DjangoDash('upload', external_stylesheets=external_stylesheets)
+app = DjangoDash('upload', add_bootstrap_links=True, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
+    dcc.Store(id="memory-output"),
     dcc.Upload(
         id='upload-data',
         children=html.Div([
@@ -43,7 +36,11 @@ app.layout = html.Div([
         html.Div(id="output-filenames"),
         dbc.Button("Submit", id='submit-val', color="primary", block=True, n_clicks=0),
         dbc.Spinner(
-            children=[html.Div(id='output-data-upload')],
+            children=[
+                html.Div(id='output-processing'),
+                html.Br(),
+                dbc.Button("Download Full Report", id='button_down', color="primary", block=True, n_clicks=0),
+                dcc.Download(id="download-report")],
             size="lg",
             color="primary",
             type="border",
@@ -53,101 +50,81 @@ app.layout = html.Div([
 ])
 
 
-def extract_filenames(list_of_filenames):
-    df = pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]})
-
-    return html.Div([
-        html.Center(html.P("The following files are up to process. Please, click the Submit button to start hunting.")),
-        dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True),
-    ])
-
-
-def parse_contents(list_of_contents, list_of_filenames):
-    handler_list = []
-
-    for contents, filename in zip(list_of_contents, list_of_filenames):
-        content_type, content_string = contents.split(',')
-
-        decoded = base64.b64decode(content_string)
-
-        try:
-            if 'pdf' in filename:
-                handler = PDFHandler(filename, io.BytesIO(decoded))
-                handler_list.append(handler)
-        except Exception as e:
-            print(e)
-            return html.Div([
-                "There was an error processing a file. DupHunter only supports PDF files."
-            ])
-
-    # detector produces the raw results
-    d = Detector(
-        handler_list,
-        # language=mode([handler.language for handler in handler_list])
-        language='portuguese'
-    )
-    d.setup_pairs()
-    results = d.process()
-    metrics = results[0]
-    excerpts = results[1]
-
-    # report produces the raw pdf file
-    # r = Report(
-    #     "templates",
-    #     pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]}).to_html(),
-    #     None,
-    #     metrics.to_html,
-    #     excerpts.to_html,
-    # )
-
-    # create divs to return
-    metrics_table = html.Div([
-        dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
-    ])
-
-    excerpts_table = html.Div([
-        dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
-    ])
-
-    # dateformat = "%Y%m%d_%H%M%S"
-    # download_button = html.Div([
-    #     dbc.Button("Download Report", id='button_down', color="primary", block=True, n_clicks=0),
-    #      dcc.Download(id="download-report",
-    #          #dcc.send_bytes(r.pdf, filename=f"duphunter_{datetime.now().strftime(dateformat)}", type='pdf')
-    #     )
-    # ])
-
-    return html.Div([
-        html.Br(),
-        html.Center(html.H1("Similarity Analysis")),
-        metrics_table,
-        html.Br(),
-        html.Center(html.H1("Excerpts under Suspicion")),
-        excerpts_table,
-        html.Br(),
-        # html.Center(html.H1("Download full report")),
-        # download_button,
-    ])
+@app.callback(Output('output-filenames', 'children'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'))
+def update_filenames(list_of_contents, list_of_names, **kwargs):
+    # changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
+    # print(changed_id)
+    # if "upload-data" in changed_id:
+    #     if list_of_contents is not None:
+    #         return Utils.extract_filenames(list_of_names)
+    if list_of_contents is not None:
+        return Utils.extract_filenames(list_of_names)
+    return html.Div()
 
 
-@app.callback(Output('output-data-upload', 'children'),
+@app.callback(Output('memory-output', 'data'),
               Input('submit-val', 'n_clicks'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               prevent_initial_call=True)
-def update_output(n_clicks, list_of_contents, list_of_names):
-    if n_clicks:
+def update_output(n_clicks, list_of_contents, list_of_names, **kwargs):
+    if n_clicks is None:
+        raise PreventUpdate
+    changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
+    if 'submit-val' in changed_id:
         if list_of_contents is not None:
-            children = [parse_contents(list_of_contents, list_of_names)]
-            return children
-    return html.Div()
+            return Utils.parse_contents(list_of_contents, list_of_names)
+    return None
 
 
-@app.callback(Output('output-filenames', 'children'),
-              Input('upload-data', 'contents'),
+@app.callback(Output('output-processing', 'children'),
+              Input('memory-output', 'data'),
+              Input('submit-val', 'n_clicks'),
+              Input('button_down', 'n_clicks'))
+def process(data, sub_clicks, dow_clicks):
+    if sub_clicks is None:
+        raise PreventUpdate
+    if dow_clicks is None:
+        raise PreventUpdate
+    if data is None:
+        raise PreventUpdate
+
+    metrics = pd.read_json(data["METRICS"], orient='split')
+    excerpts = pd.read_json(data["EXCERPTS"], orient='split')
+    fig = Utils.plot(metrics)
+
+    return html.Div([
+        html.Br(),
+        html.Center(html.H1("Similarity Analysis")),
+        dcc.Graph(figure=fig),
+        dbc.Table.from_dataframe(metrics, striped=True, bordered=True, hover=True),
+        html.Br(),
+        html.Center(html.H1("Excerpts under Suspicion")),
+        dbc.Table.from_dataframe(excerpts, striped=True, bordered=True, hover=True),
+        html.Br(),
+    ])
+
+
+@app.callback(Output('download-report', 'data'),
+              Input('button_down', 'n_clicks'),
+              Input('memory-output', 'data'),
               State('upload-data', 'filename'))
-def update_output(list_of_contents, list_of_names):
-    if list_of_contents is not None:
-        children = extract_filenames(list_of_names)
-        return children
-    return html.Div()
+def download_report(n_clicks, data, list_of_filenames, **kwargs):
+    if data is None:
+        raise PreventUpdate
+
+    metrics = pd.read_json(data["METRICS"], orient='split')
+    excerpts = pd.read_json(data["EXCERPTS"], orient='split')
+    fig = Utils.plot(metrics)
+
+    report = Utils.report('home/dash_apps/finished_apps/templates', list_of_filenames, fig, metrics, excerpts)
+
+    changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
+    if 'button_down' in changed_id:
+        dateformat = "%Y%m%d_%H%M%S"
+        return dcc.send_bytes(
+            src=report.pdf,
+            filename=f"hunt_{datetime.now().strftime(dateformat)}",
+            type='pdf')

@@ -6,10 +6,10 @@ from datetime import datetime
 from io import BytesIO
 
 
-
 class Report:
     def __init__(self, templates_folder, file_table, metrics_graphs, metrics_table, excerpts_table):
-        env = Environment(loader=FileSystemLoader(templates_folder))
+        self.templates_folder = templates_folder
+        env = Environment(loader=FileSystemLoader(self.templates_folder))
         self.template = env.get_template("report.html")
         self.vars = {
             "file_table": file_table,
@@ -25,12 +25,12 @@ class Report:
 
     def generate_pdf(self):
         b = io.BytesIO()
-        HTML(string=self.html).write_pdf(b, stylesheets=["templates/style.css"])
+        HTML(string=self.html).write_pdf(b, stylesheets=[self.templates_folder + "/style.css"])
         return b.getvalue()
 
     def save_pdf(self):
         dateformat = "%Y%m%d_%H%M%S"
         HTML(string=self.html).write_pdf(
             target=f"duphunter_{datetime.now().strftime(dateformat)}.pdf",
-            stylesheets=["templates/style.css"]
+            stylesheets=[self.templates_folder + "/style.css"]
         )

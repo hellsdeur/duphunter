@@ -41,12 +41,15 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'channels',
-    'channels_redis'
+    'channels_redis',
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,15 +153,18 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django_plotly_dash.finders.DashAssetFinder',
-    'django_plotly_dash.finders.DashComponentFinder'
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
 ]
 
 PLOTLY_COMPONENTS = [
     'dash_core_components',
     'dash_html_components',
+    'dash_bootstrap_components',
     'dash_renderer',
-
-    'dpd_components'
+    'dpd_components',
+    'dpd_static_support',
+    'dpd_components',
 ]
 
 # Static files (CSS, JavaScript, Images)
