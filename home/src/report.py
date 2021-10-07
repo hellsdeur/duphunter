@@ -13,7 +13,7 @@ class Report:
         self.template = env.get_template("report.html")
         self.vars = {
             "file_table": file_table,
-            "metrics_graphs": metrics_graphs,
+            "metrics_graphs": metrics_graphs.decode("ascii"),
             "metrics_table": metrics_table,
             "excerpts_table": excerpts_table,
         }

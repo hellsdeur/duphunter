@@ -92,12 +92,11 @@ class Utils:
         return fig
 
     @staticmethod
-    def report(list_of_filenames, fig, metrics, excerpts):
+    def report(templates_folder, list_of_filenames, fig, metrics, excerpts):
         return Report(
-            "templates",
-            pd.DataFrame({"FILENAMES": [filename for filename in list_of_filenames if "pdf" in filename]}).to_html(),
-            # pio.to_html(fig=fig),
-            fig,
+            templates_folder,
+            pd.DataFrame({"FILENAMES": [filename for filename in sorted(list_of_filenames) if "pdf" in filename]}).to_html(),
+            base64.b64encode(pio.to_image(fig)),
             metrics.to_html(),
             excerpts.to_html(),
         )

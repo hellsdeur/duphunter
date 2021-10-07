@@ -55,11 +55,12 @@ app.layout = html.Div([
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'))
 def update_filenames(list_of_contents, list_of_names, **kwargs):
-    changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
-    print(changed_id)
-    if "upload-data" in changed_id:
-        if list_of_contents is not None:
-            return Utils.extract_filenames(list_of_names)
+    # changed_id = [p['prop_id'] for p in kwargs['callback_context'].triggered][0]
+    # if "upload-data" in changed_id:
+    #     if list_of_contents is not None:
+    #         return Utils.extract_filenames(list_of_names)
+    if list_of_contents is not None:
+        return Utils.extract_filenames(list_of_names)
     return None
 
 

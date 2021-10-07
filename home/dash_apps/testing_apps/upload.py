@@ -14,7 +14,6 @@ external_stylesheets = [dbc.themes.LUMEN]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    dcc.Store(id="memory-output"),
     dcc.Upload(
         id='upload-data',
         children=html.Div([
@@ -32,6 +31,7 @@ app.layout = html.Div([
         },
         multiple=True
     ),
+    dcc.Store(id="memory-output"),
     html.Div([
         html.Div(id="output-filenames"),
         dbc.Button("Submit", id='submit-val', color="primary", block=True, n_clicks=0),
@@ -39,13 +39,14 @@ app.layout = html.Div([
             children=[
                 html.Div(id='output-processing'),
                 html.Br(),
-                dbc.Button("Download Full Report", id='button_down', color="primary", block=True, n_clicks=0),
-                dcc.Download(id="download-report")],
+            ],
             size="lg",
             color="primary",
             type="border",
             fullscreen=True,
-        )
+        ),
+        dbc.Button("Download Full Report", id='button_down', color="primary", block=True, n_clicks=0),
+        dcc.Download(id="download-report")
     ]),
 ])
 
@@ -53,9 +54,8 @@ app.layout = html.Div([
 @app.callback(Output('output-filenames', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'))
-def update_filenames(list_of_contents, list_of_names):
+def update_filenames(list_of_contents, list_of_names, **kwargs):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-    print(changed_id)
     if "upload-data" in changed_id:
         if list_of_contents is not None:
             return Utils.extract_filenames(list_of_names)
@@ -67,7 +67,7 @@ def update_filenames(list_of_contents, list_of_names):
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               prevent_initial_call=True)
-def update_output(n_clicks, list_of_contents, list_of_names):
+def update_output(n_clicks, list_of_contents, list_of_names, **kwargs):
     if n_clicks is None:
         raise PreventUpdate
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
@@ -110,7 +110,7 @@ def process(data, sub_clicks, dow_clicks, list_of_filenames):
               Input('button_down', 'n_clicks'),
               Input('memory-output', 'data'),
               State('upload-data', 'filename'))
-def download_report(n_clicks, data, list_of_filenames):
+def download_report(n_clicks, data, list_of_filenames, **kwargs):
     if n_clicks is None:
         raise PreventUpdate
     if data is None:
@@ -119,7 +119,7 @@ def download_report(n_clicks, data, list_of_filenames):
     metrics = pd.read_json(data["METRICS"], orient='split')
     excerpts = pd.read_json(data["EXCERPTS"], orient='split')
     fig = Utils.plot(metrics)
-    report = Utils.report(list_of_filenames, fig, metrics, excerpts)
+    report = Utils.report("templates", list_of_filenames, fig, metrics, excerpts)
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if 'button_down' in changed_id:
         return dcc.send_bytes(

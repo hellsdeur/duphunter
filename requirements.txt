@@ -11,7 +11,7 @@ certifi==2021.5.30
 cffi==1.14.6
 channels==3.0.4
 channels-redis==3.3.0
-chardet==4.0.0
+chardet==3.0.4
 charset-normalizer==2.0.6
 click==8.0.1
 constantly==15.1.0
@@ -40,7 +40,7 @@ gunicorn==20.1.0
 hiredis==2.0.0
 html5lib==1.1
 hyperlink==21.0.0
-idna==3.2
+idna==2.10
 importlib-metadata==2.1.1
 incremental==21.3.0
 itsdangerous==2.0.1
