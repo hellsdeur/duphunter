@@ -122,5 +122,5 @@ def download_report(n_clicks, data, list_of_filenames, **kwargs):
     if 'button_down' in changed_id:
         return dcc.send_bytes(
             src=report.pdf,
-            filename=f"hunt_{datetime.now().strftime(dateformat)}",
+            filename=f"duphunter_{datetime.now().strftime(dateformat)}",
             type='pdf')
