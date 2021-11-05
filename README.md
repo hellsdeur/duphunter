@@ -9,7 +9,8 @@
 
 The initial objective was fulfilled with the creation. This is an analysis of plagiarism among a set of pdf files. After such analysis, a report with comparative indexes is generated.
 
-The technologies used include: - Django: MVT architecture
+The technologies used include: 
+- Django: MVT architecture
 - Dash: interactive applications
 - Plotly: interactive graphics
 - NLTK: natural language processing
