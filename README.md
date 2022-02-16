@@ -5,7 +5,7 @@
  
 <a href="https://ibb.co/fd4c1HV"><img align="right" alt="Rafa-pic" height="150" style="border-radius:22px;" src="https://i.ibb.co/fd4c1HV/dup-hunter-logo.jpg" alt="dup-hunter-logo" border="0"></a>
 </div> 
-<p>Dup Hunter emerged from a work developed in the discipline of Software Design and Analysis taught by Professor Gusvato Pinto at UFPA. The students participating in the development are: Helder Matos, Lívia Carrera, Pedro Rocha and Thiago Calado.<p/>
+<p>Dup Hunter emerged from a work developed in the discipline of Software Design and Analysis taught by Professor Gusvato Pinto at UFPA. The students participating in the development are: Helder Matos, Lívia Carrera, Pedro Henrique Rocha and Thiago Calado.<p/>
 
 The initial objective was fulfilled with the creation. This is an analysis of plagiarism among a set of pdf files. After such analysis, a report with comparative indexes is generated.
 
